@@ -16,8 +16,8 @@ app.get("/",(req,res)=>[
 
 // app.use("/api", require("./router/Auth.router/auth.router")) // auth api----done
 app.use("/api",require("./router/admin.router/admin.router"))// admin api---- done
-app.use("/api",require("./router/receivedPayment.router/receivedPayment.router"))// received payment api---- done //client
-app.use("/api",require("./router/expense.router/expense.router"))  // expense submit api---- done // supervisor
+app.use("/api",require("./router/client.router/client.router"))// received payment api---- done //client
+app.use("/api",require("./router/supervisor.router/supervisor.router"))  // expense submit api---- done // supervisor
 
 app.listen(port, ()=>{
     console.log(`Server is running on port http://localhost:${port}`);

@@ -5,10 +5,10 @@ const Payments = require("../../Schema/recivedPayments.Schema/payment.model.js")
 const Site = require("../../Schema/site.Schema/site.model.js");
 
 
-router.post("/received/payments", async (req, res)=>{
-    const {clientEmail,siteId,amount, mode,transationDate,status }= req.body;
-    console.log(clientEmail,siteId,amount,mode,transationDate,status)
-    if(!clientEmail || !siteId || !amount || !transationDate || !mode  || !status){
+router.post("/received/payment", async (req, res)=>{
+    const {clientEmail,siteId,amount, mode,transationDate }= req.body;
+    console.log(clientEmail,siteId,amount,mode,transationDate)
+    if(!clientEmail || !siteId || !amount || !transationDate || !mode  ){
         return res.status(400).send({
             success: false,
             message: "All fields are required"
@@ -36,8 +36,8 @@ router.post("/received/payments", async (req, res)=>{
             siteId:site._id,
             amount : amount,
             mode : mode,
-            // transationDate : transationDate,
-            status : status,
+            transationDate : transationDate,
+            status : "pending",
 
         })
         await payment.save();

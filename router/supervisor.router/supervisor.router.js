@@ -1,10 +1,40 @@
 const express = require("express");
+const Supervisor = require("../../Schema/supervisor.schema/supervisor.model");
+const Site = require("../../Schema/site.Schema/site.model");
+const Expense = require("../../Schema/expenses.schema/expense.model");
 const router = express.Router();
-const Supervisor = require("../../Schema/supervisor.schema/supervisor.model")
-const Site = require("../../Schema/site.Schema/site.model")
-const Expense = require("../../Schema/expenses.schema/expense.model")
 
-router.post("/expenses/submit", async (req,res)=>{
+// router to get allorted site
+router.get("/allortedSite",async(req,res)=>{
+    const {email}= req.body
+    try{
+        const user = await Supervisor.findOne({email:email});
+        console.log(user)
+        const siteData = await Site.findOne({clientId:user.allorted_client})
+        console.log(siteData);
+        
+        if(siteData.length <= 0){
+            return res.send({
+                success:false,
+                message:"no site found"
+            })
+        }
+        return res.status(200).send({
+            success:true,
+            message:"data found....",
+            data:siteData
+        })
+    }
+    catch(err){
+        return res.status(501).send({
+            success:false,
+            message:"error:- "+err
+        })
+    }
+})
+
+// router for expense approval
+router.post("/expense/detail",async(req,res)=>{
     const { supervisor_email, site_name, type, amount, date, description } = req.body;
     console.log(supervisor_email, site_name, type, amount, date, description)
     try {
@@ -24,7 +54,7 @@ router.post("/expenses/submit", async (req,res)=>{
         }
 
         if (siteDetail.supervisorId.toString() === supervisorDetails._id.toString()) {
-            const data = Expense.create({
+            const data = await Expense.create({
                 supervisor_id: supervisorDetails._id,
                 site_name: siteDetail.siteName,
                 type: type,
@@ -49,7 +79,9 @@ router.post("/expenses/submit", async (req,res)=>{
             message: "internal server error" + err
         })
     }
-
 })
 
-module.exports=router;
+// router for progress report
+router.post("/report/progress",(req,res)=>{})
+
+module.exports = router;
