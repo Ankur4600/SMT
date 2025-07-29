@@ -3,8 +3,11 @@ const router = express.Router();
 const Client = require("../../Schema/client.schema/client.model.js");
 const Payments = require("../../Schema/recivedPayments.Schema/payment.model.js");
 const Site = require("../../Schema/site.Schema/site.model.js");
+const Progress = require("../../Schema/progressReport.schema/progressReport.model.js");
 
 
+
+// router for payment send to the company
 router.post("/received/payment", async (req, res)=>{
     const {clientEmail,siteId,amount, mode,transationDate }= req.body;
     console.log(clientEmail,siteId,amount,mode,transationDate)
@@ -54,5 +57,34 @@ router.post("/received/payment", async (req, res)=>{
         })
     }
 })
+
+
+// router for progress report
+router.get("/progress/report",async (req,res)=>{
+    const{siteID,supervisorID} = req.body;
+    try{
+        const progressReport = await Progress.findOne({site:siteID,supervisor:supervisorID})
+        console.log(progressReport)
+        if(!progressReport){
+            return res.send({
+                success:false,
+                message:"no progress report found"
+            })
+        }
+        return res.status(200).send({
+            success:true,
+            message:"progress report found",
+            data:progressReport
+        })
+    }
+    catch(err){
+        res.status(501).send({
+            success:false,
+            message:`error found:-${err.message}`
+        })
+    }
+})
+
+// router for 
 
 module.exports = router
