@@ -1,13 +1,49 @@
 const express = require('express');
 const User = require("../../Schema/users.schema/users.model")
+const Admin = require("../../Schema/admin.schema/admine.model")
 const router = express.Router();
 const bcrypt = require('bcrypt');
 require('dotenv').config()
 const secretCode = process.env.SECRET_KEY;
 const jwt = require('jsonwebtoken');
 
-router.post("/auth/login", async (req, res) => {
+// admin signup
+router.post("/auth/signup", async(req,res)=>{
+  const { name, email,password,mobile,role} =req.body;
+  try {
+    const admin = await Admin.find();
+    console.log(admin)
+    if(admin.length>0){
+      return res.send({
+        success:false,
+        message:"invalid request"
+      })
+    }
 
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password,salt)
+    const data = new Admin({
+      name:name,
+      email:email,
+      password:hashPassword,
+      mobile:mobile,
+      role:role
+    })
+    await data.save();
+    return res.status(200).send({
+      success:true,
+      message:"SignUp success...",
+      data:data,
+    })
+  } catch (error) {
+    return res.status(500).send({
+      success:false,
+      message:"error:- "+error.message,
+    })
+  }
+})
+
+router.post("/auth/login", async (req, res) => {
   const { email, password } = req.body
   console.log(email, password);
   let user = await User.findOne({ email });

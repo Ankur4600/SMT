@@ -13,6 +13,9 @@ const Supervisor = require("../../Schema/supervisor.schema/supervisor.model.js")
 const Site = require("../../Schema/site.Schema/site.model.js");
 const Expense = require("../../Schema/expenses.schema/expense.model.js");
 const Payments = require("../../Schema/recivedPayments.Schema/payment.model.js");
+const Role = require("../../Schema/addRole.schema/addRole.model.js");
+const Admin = require("../../Schema/admin.schema/admine.model.js")
+
 // admin login
 // router.post("/admin/login", async (req, res) => {
 //   const { email, password } = req.body;
@@ -64,6 +67,40 @@ const Payments = require("../../Schema/recivedPayments.Schema/payment.model.js")
 //   }
 // });
 
+// router for add role
+router.post("/add/role" , async(req,res)=>{
+  const {roleName,description,isActive,adminId} = req.body
+  try{
+    const role = await Role.findOne({roleName:roleName});
+    const admin = await Admin.findById({_id:adminId})
+    if(role || !admin){
+      return res.send({
+        success:true,
+        message:"either role already exists or admin not found"
+      })
+    }
+    const data = new Role({
+      roleName:roleName,
+      description:description,
+      isActive:isActive,
+      createdBy:adminId
+    })
+    await data.save();
+    return res.status(200).send({
+      success:true,
+      message:"new role created..."
+    })
+    
+  }
+  catch(err){
+    return res.status(500).send({
+      success:true,
+      message:"error :- "+err.message,
+    })
+  }
+})
+
+
 //router to create user
 router.post("/create/user", async (req, res) => {
   const { name, email, mobile, role, password } = req.body;
@@ -77,7 +114,6 @@ router.post("/create/user", async (req, res) => {
   }
 
   let salt = await bcrypt.genSalt(10);
-  console.log(salt);
   let hashPassword = await bcrypt.hash(password, salt);
   console.log(hashPassword);
 
@@ -126,6 +162,27 @@ router.get("/get/users", async (req, res) => {
   }
 });
 
+// router for getting admin detail
+router.get("/admin/detail",async(req,res)=>{
+  try {
+    const admin = await User.find({role:"admin"});
+    console.log(admin)
+    if(!admin || !admin.length === 0){
+      return res.send({
+        success:false,
+        message:"no admin data found !!!"
+      })
+    }
+    res.status(200).send({
+      success:true,
+      message:""
+    })
+
+  } catch (error) {
+    
+  }
+})
+
 // router to get clients detail
 router.get("/client/detail", async (req, res) => {
   try {
@@ -145,8 +202,8 @@ router.get("/client/detail", async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: "Supervisors fetched successfully",
-      number_of_supervisors: clientdata.length,
+      message: "Client fetched successfully",
+      number_of_Client: clientdata.length,
       data: clientdata,
     });
   } catch (err) {

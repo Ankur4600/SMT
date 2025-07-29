@@ -14,7 +14,7 @@ app.get("/",(req,res)=>[
     res.send("this is home page")
 ])
 
-// app.use("/api", require("./router/Auth.router/auth.router")) // auth api----done
+app.use("/api", require("./router/Auth.router/auth.router")) // auth api----done
 app.use("/api",require("./router/admin.router/admin.router"))// admin api---- done
 app.use("/api",require("./router/client.router/client.router"))// client api---- 
 app.use("/api",require("./router/supervisor.router/supervisor.router"))  //supervisor api---- done 
